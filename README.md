@@ -30,20 +30,20 @@ How to run:
 Specify MAG completeness thresholds in the first column, followed by the cutoffs for key enzyme percentage 
 and pathway completeness will be used when MAG completeness NO LESS THAN the specified threshold.
 
-1. Genome completeness file format [[example](example_data/mag_completeness.txt)]: no header, no genome file extension, tab separated.
+1. Genome completeness file format [[example](example_data/mag_cpl.txt)]: no header, no genome file extension, tab separated.
     
 1. Example commands for running detectCFP
 
-    Detect CFP with default fixed cut-offs for key enzyme percentage and pathway completeness
+   + Detect CFP with default fixed cut-offs for key enzyme percentage (50%) and pathway completeness (80%)
     
-       detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 
-       detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -faa faa_files
+         detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 
+         detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -faa faa_files
 
-    Detect CFP with customized fixed cut-offs (-c 70,80)
+   + Detect CFP with customized fixed cut-offs for key enzyme percentage (70%) and pathway completeness (80%)
        
-       detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -c 70,80
+         detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -c 70,80
 
-    Detect CFP with genome specific cut-offs according to genome completeness
+   + Detect CFP with genome specific cut-offs according to genome completeness
 
-       detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -c cutoff_table.txt -q mag_cpl.txt
+         detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -c cutoff_table.txt -q mag_cpl.txt
 
