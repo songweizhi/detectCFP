@@ -27,7 +27,7 @@ How to run:
 ---
 
 1. Cut-off table format (-c) [[example](example_data/cutoff_table.txt)]: file header has to be "MAG	PWY	Enzyme" (tab separated). 
-Specify MAG completeness thresholds in the first column, followed by the cutoffs for key enzyme percentage 
+Specify MAG completeness thresholds in the first column (in decreasing order), followed by the cutoffs for key enzyme percentage 
 and pathway completeness will be used when MAG completeness NO LESS THAN the specified threshold.
 
 1. Genome completeness file format [[example](example_data/mag_cpl.txt)]: no header, no genome file extension, tab separated.

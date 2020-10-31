@@ -530,8 +530,8 @@ Note:
     key enzyme percentage cutoff, followed by pathway completeness cutoff, comma separated, e.g.: 
     -c 50,80
 
-8. cutoff_table file format (-c): file header has to be "MAG	PWY	Enzyme" (tab separated). Specify MAG completeness in the first column, 
-   followed by the cutoffs for key enzyme percentage and pathway completeness will be used when MAG completeness NO LESS THAN the specified value, e.g.:
+8. Cut-off table format (-c): file header has to be "MAG	PWY	Enzyme" (tab separated). Specify MAG completeness thresholds in the first column (in decreasing order), 
+   followed by the cutoffs for key enzyme percentage and pathway completeness will be used when MAG completeness NO LESS THAN the specified threshold.
     MAG	PWY	Enzyme
     95	80	50
     90	75	45
