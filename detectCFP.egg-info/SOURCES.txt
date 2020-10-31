@@ -1,0 +1,10 @@
+MANIFEST.in
+README.md
+setup.py
+bin/detectCFP
+detectCFP/VERSION
+detectCFP.egg-info/PKG-INFO
+detectCFP.egg-info/SOURCES.txt
+detectCFP.egg-info/dependency_links.txt
+detectCFP.egg-info/requires.txt
+detectCFP.egg-info/top_level.txt

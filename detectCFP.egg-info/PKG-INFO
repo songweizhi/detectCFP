@@ -1,0 +1,18 @@
+Metadata-Version: 1.0
+Name: detectCFP
+Version: 1.0.0
+Summary: Detect carbon fixation pathways
+Home-page: https://github.com/songweizhi/detectCFP
+Author: Weizhi Song
+Author-email: songwz03@gmail.com
+License: GPL3+
+Description: 
+        
+        detectCFP: Detect carbon fixation pathways
+        Weizhi Song (songwz03@gmail.com)
+        Center for Marine Science & Innovation (CMSI)
+        University of New South Wales, Sydney, Australia
+        
+        
+Keywords: Bioinformatics CarbonFixationPathway
+Platform: UNKNOWN
