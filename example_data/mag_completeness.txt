@@ -1,0 +1,11 @@
+APA_bin_1	91.59
+APA_bin_56	100
+CAR2_bin_25	85.92
+COS1_bin_11	76.86
+mag_1	97.57
+mag_2	74.21
+mag_3	100
+mag_4	95.79
+mag_5	100
+mag_31	96.12
+RHO1_bin_37	100
