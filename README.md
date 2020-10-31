@@ -1,5 +1,5 @@
 
-## detectCFP (Detect carbon fixation pathways)
+## detectCFP (Pipeline for detecting carbon fixation pathways)
 
 [![pypi licence](https://img.shields.io/pypi/l/detectCFP.svg)](https://opensource.org/licenses/gpl-3.0.html)
 [![pypi version](https://img.shields.io/pypi/v/detectCFP.svg)](https://pypi.python.org/pypi/detectCFP) 
@@ -14,13 +14,14 @@ Dependencies
 How to install:
 ---
 
-detectCFP can be installed via `pip3`:
++ To install
 
-    # First-time installation
-    pip3 install detectCFP
-        
-    # upgrade
-    pip3 install --upgrade detectCFP
+      pip3 install detectCFP
+
++ To upgrade
+   
+      pip3 install --upgrade detectCFP
+
 
 How to run:
 ---
@@ -33,7 +34,16 @@ and pathway completeness will be used when MAG completeness NO LESS THAN the spe
     
 1. Example commands for running detectCFP
 
+    Detect CFP with default fixed cut-offs for key enzyme percentage and pathway completeness
+    
        detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 
        detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -faa faa_files
+
+    Detect CFP with customized fixed cut-offs (-c 70,80)
+       
        detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -c 70,80
-       detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -c cutoff_table.txt -q mag_completeness.txt
+
+    Detect CFP with genome specific cut-offs according to genome completeness
+
+       detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -c cutoff_table.txt -q mag_cpl.txt
+

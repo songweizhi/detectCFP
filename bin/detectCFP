@@ -31,8 +31,12 @@ module load cplex/12.9.0-academic
 # example commands
 python3 detectCFP.py -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 
 python3 detectCFP.py -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -faa faa_files
+
+# with fixed cut-offs for key enzyme percentage and pathway completeness
 python3 detectCFP.py -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -c 70,80
-python3 detectCFP.py -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -c cutoff_table.txt -q mag_completeness.txt
+
+# Genome specific cut-offs according to genome completeness
+python3 detectCFP.py -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -c cutoff_table.txt -q mag_cpl.txt
 
 ========================================================================================================================
 '''
@@ -541,5 +545,4 @@ Note:
 10. '-c' and '-q' need to be provided together.
 
 '''
-
 
