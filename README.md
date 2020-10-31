@@ -22,7 +22,6 @@ detectCFP can be installed via `pip3`:
     # upgrade
     pip3 install --upgrade detectCFP
 
-
 How to run:
 ---
 
@@ -30,19 +29,8 @@ How to run:
 Specify MAG completeness thresholds in the first column, followed by the cutoffs for key enzyme percentage 
 and pathway completeness will be used when MAG completeness NO LESS THAN the specified threshold, e.g.:
 
-       MAG	PWY	Enzyme
-       95	80	50
-       90	75	45
-       70	50	45
-
-
 1. Genome completeness file format [[example](example_data/mag_completeness.txt)] (no header, no genome file extension, tab separated)
     
-       mag_1	97.57
-       mag_2	74.21
-       mag_3	100
-
-
 1. Example commands for running detectCFP
 
        detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 
