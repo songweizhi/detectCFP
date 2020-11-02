@@ -35,7 +35,7 @@ python3 detectCFP.py -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2
 # with fixed cut-offs for key enzyme percentage and pathway completeness
 python3 detectCFP.py -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -c 70,80
 
-# Genome specific cut-offs according to genome completeness
+# genome specific cut-offs according to genome completeness
 python3 detectCFP.py -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -c cutoff_table.txt -q mag_cpl.txt
 
 ========================================================================================================================
@@ -143,7 +143,7 @@ def detectCFP(args):
     prodigal_output_folder                      = '%s/%s_prodigal_output'          % (detectCFP_wd, output_prefix)
     hmmsearch_output_folder                     = '%s/%s_hmmsearch_output'         % (detectCFP_wd, output_prefix)
     gapseq_output_folder                        = '%s/%s_gapseq_output'            % (detectCFP_wd, output_prefix)
-    gapseq_output_folder_combined_Pathways      = '%s/combined_Pathways'           % gapseq_output_folder
+    gapseq_output_folder_combined_Pathways      = '%s/%s_combined_Pathways'        % (gapseq_output_folder, output_prefix)
     cmd_file_prodigal                           = '%s/%s_cmds_prodigal.txt'        % (detectCFP_wd, output_prefix)
     cmd_file_hmmsearch                          = '%s/%s_cmds_hmmsearch.txt'       % (detectCFP_wd, output_prefix)
     cmd_file_gapseq                             = '%s/%s_cmds_gapseq.txt'          % (detectCFP_wd, output_prefix)
@@ -518,31 +518,34 @@ Note:
     1) file header need to be "PWY	HMM", separated by tab.
     2) pathway id and hmm id(s) are separated by tab. if there are multiple key enzymes in a pathway, hmm ids need to be separated by comma.
 
-5. final output 1:
-    1) each pathway in the final output has three columns: PWY_HMM, PWY_completeness and PWY_found
-    2) PWY_HMM: "_n_" refers to "and " and "_v_" refers to "or ".
-    3) PWY_completeness: Gapseq provided completeness
-    4) PWY_found: "1" for detected and "0" for not.
-
-6. final output 2: presence/absence matrices of interested pathways among MAGs.
-
-7. fixed cutoffs for key enzyme percentage and pathway completeness (-c): 
+5. format of fixed cutoffs for key enzyme percentage and pathway completeness (-c): 
     key enzyme percentage cutoff, followed by pathway completeness cutoff, comma separated, e.g.: 
     -c 50,80
 
-8. Cut-off table format (-c): file header has to be "MAG	PWY	Enzyme" (tab separated). Specify MAG completeness thresholds in the first column (in decreasing order), 
+6. Cut-off table format (-c): file header has to be "MAG	PWY	Enzyme" (tab separated). Specify MAG completeness thresholds in the first column (in decreasing order), 
    followed by the cutoffs for key enzyme percentage and pathway completeness will be used when MAG completeness NO LESS THAN the specified threshold.
     MAG	PWY	Enzyme
     95	80	50
     90	75	45
     70	50	45
 
-9.  MAG completeness file format (-q): no header, no mag file extension, tab separated
+7.  MAG completeness file format (-q): no header, no mag file extension, tab separated
     mag_1	97.57
     mag_2	74.21
     mag_3	100
     
-10. '-c' and '-q' need to be provided together.
+8. '-c' and '-q' need to be provided together.
+
+9. final output 1:
+    1) each pathway in the final output has three columns: PWY_HMM, PWY_completeness and PWY_found
+    2) PWY_HMM: "_n_" refers to "and " and "_v_" refers to "or ".
+    3) PWY_completeness: Gapseq provided completeness
+    4) PWY_found: "1" for detected and "0" for not.
+
+10. final output 2: presence/absence matrices of interested pathways among MAGs.
+
+Example:
+python3 detectCFP.py -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -c cutoff_table.txt -q mag_cpl.txt
 
 '''
 
