@@ -87,6 +87,7 @@ def detectCFP(args):
     faa_folder                       = args['faa']
     hmm_profiles                     = args['hmm']
     hmm_evalue                       = args['e']
+    gapseq_bitscore                  = args['gapseq_b']
     pwy_to_key_enzyme_file           = args['k']
     dynamic_pcc                      = args['dynamic_pcc']
     dynamic_kecc                     = args['dynamic_kecc']
@@ -160,9 +161,25 @@ def detectCFP(args):
     if (dynamic_kecc is True) or (dynamic_pcc is True):
         for each_genome in open(mag_cpl_file):
             each_genome_split = each_genome.strip().split('\t')
-            genome_id = each_genome_split[0]
-            genome_cpl = float(each_genome_split[1])
-            genome_cpl_dict[genome_id] = genome_cpl
+            if each_genome_split != ['']:
+                genome_id = each_genome_split[0]
+                genome_cpl = float(each_genome_split[1])
+                genome_cpl_dict[genome_id] = genome_cpl
+
+    # report genomes without cpl info
+    if (dynamic_kecc is True) or (dynamic_pcc is True):
+
+        genomes_without_cpl_info = []
+        for input_genome in genome_file_list_no_extension:
+            if input_genome not in genome_cpl_dict:
+                genomes_without_cpl_info.append(input_genome)
+
+        if genomes_without_cpl_info != []:
+
+            print('Completeness info not found for the following genomes:')
+            print(','.join(genomes_without_cpl_info))
+            print('Completeness info not found for above genomes, program exited!')
+            exit()
 
     if faa_folder is None:
 
@@ -352,7 +369,7 @@ def detectCFP(args):
             pwd_genome_file = '../../%s' % pwd_genome_file
 
         for qualified_pwy in qualified_pwys:
-            gapseq_cmd = '%s find -p %s -b 200 %s > %s-%s-stdout.tbl' % (gapseq_exe, qualified_pwy, pwd_genome_file, qualified_genome, qualified_pwy)
+            gapseq_cmd = '%s find -p %s -b %s %s > %s-%s-stdout.tbl' % (gapseq_exe, qualified_pwy, gapseq_bitscore, pwd_genome_file, qualified_genome, qualified_pwy)
             cmd_file_gapseq_handle.write('%s\n' % gapseq_cmd)
             argument_list_for_gapseq_worker.append(gapseq_cmd)
     cmd_file_gapseq_handle.close()
@@ -497,6 +514,7 @@ if __name__ == '__main__':
     detectCFP_parser.add_argument('-hmm',           required=True,                               help='hmm profiles')
     detectCFP_parser.add_argument('-k',             required=True,                               help='pathway to hmm profiles')
     detectCFP_parser.add_argument('-e',             required=False, default='1e-99',             help='evalue cutoff for hmmsearch, default: 1e-99')
+    detectCFP_parser.add_argument('-gapseq_b',      required=False, default='200',               help='Bit score cutoff for GapSeq, default: 200')
     detectCFP_parser.add_argument('-dynamic_kecc',  required=False, action="store_true",         help='use genome specific key enzyme completeness cutoff')
     detectCFP_parser.add_argument('-dynamic_pcc',   required=False, action="store_true",         help='use genome specific pathway completeness cutoff')
     detectCFP_parser.add_argument('-q',             required=False, default=None,                help='genome completeness, no header, no genome file extension, tab separated')
@@ -521,11 +539,16 @@ twine upload dist/*
 songweizhi
 
 shan88
+
+pip3 install --upgrade detectCFP
+
+# for test
+~/PycharmProjects/detectCFP/bin/detectCFP2 -p Sponge -g mag_files_renamed -x fna -hmm combined.HMM -k pathwaysXhmmfiles.txt -force -faa faa_files -dynamic_pcc -dynamic_kecc
+
 '''
 
 
 '''
-
 Note:
 1. HMM id in the HMM file and the path2hmm file need to be consistent. 
 
@@ -549,8 +572,8 @@ Note:
     1) file header has to be "Pwy	KeyEnzyme	PwyCpl	KeyEnzymeCpl".
     2) column 1: pathway id, no "|" at the two ends
     3) column 2: key enzymes, if there are multiple key enzymes, separate by comma.
-    4) column 3: minimum pathway completeness for the pathway to be considered as existing in a complete genome.
-    5) column 4: minimum key enzyme completeness for the pathway to be considered as existing in a complete genome.
+    4) column 3: minimum pathway completeness for the pathway to be considered as existing in complete genome.
+    5) column 4: minimum key enzyme completeness for the pathway to be considered as existing in complete genome.
 
 5.  MAG completeness file format (-q): no header, no mag file extension, tab separated
     mag_1	97.57
@@ -563,9 +586,6 @@ Note:
     3) PWY_cpl: Gapseq provided pathway completeness
     4) PWY_found: "1" for detected and "0" for not.
 
-7. final output 2: presence/absence matrices of interested pathways among MAGs.
-
-# commands backup
-~/PycharmProjects/detectCFP/bin/detectCFP2 -p Sponge -g mag_files_renamed -x fna -hmm combined.HMM -k pathwaysXhmmfiles.txt -force -faa faa_files -dynamic_pcc -dynamic_kecc
+7. final output 2: presence/absence of pathways among MAGs.
 
 '''
