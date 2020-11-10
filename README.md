@@ -30,8 +30,7 @@ How to run:
     
 1. Example commands for running detectCFP
 
-   + **kecc**: key enzyme completeness cut-off
-   + **pcc**: pathway completeness cut-off
+   + **kecc**: key enzyme completeness cut-off; **pcc**: pathway completeness cut-off.
 
    + with fixed kecc and fixed pcc, as specified in path2hmm.txt
          
