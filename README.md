@@ -26,24 +26,22 @@ How to install:
 How to run:
 ---
 
-1. Cut-off table format (-c) [[example](example_data/cutoff_table.txt)]: file header has to be "MAG	PWY	Enzyme" (tab separated). 
-Specify MAG completeness thresholds in the first column (in decreasing order), followed by the cutoffs for key enzyme percentage 
-and pathway completeness will be used when MAG completeness NO LESS THAN the specified threshold.
-
 1. Genome completeness file format [[example](example_data/mag_cpl.txt)]: no header, no genome file extension, tab separated.
     
 1. Example commands for running detectCFP
 
-   + Detect CFP with default fixed cut-offs for key enzyme percentage (50%) and pathway completeness (80%)
-    
-         detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 
-         detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -faa faa_files
+   + with **fixed** key enzyme completeness cut-off and **fixed** pathway completeness cut-off, as specified in path2hmm.txt
+         
+         detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force 
 
-   + Detect CFP with customized fixed cut-offs for key enzyme percentage (70%) and pathway completeness (80%)
-       
-         detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -c 70,80
+   + with **dynamic** key enzyme completeness cut-off and **fixed** pathway completeness cut-off, requires genome completeness info
 
-   + Detect CFP with genome specific cut-offs according to genome completeness
+         detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -dynamic_kecc -q MAG_cpl.txt 
 
-         detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 6 -c cutoff_table.txt -q mag_cpl.txt
+   + with **fixed** key enzyme completeness cut-off and **dynamic** pathway completeness cut-off, requires genome completeness info
 
+         detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -dynamic_pcc -q MAG_cpl.txt 
+
+   + with **dynamic** key enzyme completeness cut-off and **dynamic** pathway completeness cut-off, requires genome completeness info
+
+         detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -dynamic_kecc -dynamic_pcc -q MAG_cpl.txt
