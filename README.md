@@ -30,18 +30,21 @@ How to run:
     
 1. Example commands for running detectCFP
 
-   + with **fixed** key enzyme completeness cut-off and **fixed** pathway completeness cut-off, as specified in path2hmm.txt
+   + **kecc**: key enzyme completeness cut-off
+   + **pcc**: pathway completeness cut-off
+
+   + with fixed kecc and fixed pcc, as specified in path2hmm.txt
          
          detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force 
 
-   + with **dynamic** key enzyme completeness cut-off and **fixed** pathway completeness cut-off, requires genome completeness info
+   + with dynamic kecc and fixed pcc, requires genome completeness info
 
          detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -dynamic_kecc -q MAG_cpl.txt 
 
-   + with **fixed** key enzyme completeness cut-off and **dynamic** pathway completeness cut-off, requires genome completeness info
+   + with fixed kecc and dynamic pcc, requires genome completeness info
 
          detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -dynamic_pcc -q MAG_cpl.txt 
 
-   + with **dynamic** key enzyme completeness cut-off and **dynamic** pathway completeness cut-off, requires genome completeness info
+   + with dynamic kecc and dynamic pcc, requires genome completeness info
 
          detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -dynamic_kecc -dynamic_pcc -q MAG_cpl.txt
