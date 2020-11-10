@@ -26,7 +26,7 @@ How to install:
 How to run:
 ---
 
-1. Genome completeness file format [[example](example_data/mag_cpl.txt)]: no header, no genome file extension, tab separated.
+1. Genome completeness file format [[example](example_data/mag_cpl.txt)]: **NO** header, **NO** genome file extension, **TAB** separated.
     
 1. Example commands for running detectCFP
 
