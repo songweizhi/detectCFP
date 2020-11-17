@@ -32,16 +32,16 @@ export PATH=/srv/scratch/z5039045/Softwares/gapseq:$PATH
 
 # example commands
 # with fixed key enzyme completeness cut-off and pathway completeness cut-off, as specified in path2hmm.txt
-detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force 
+detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -taxon MAG_taxonomy.txt 
 
 # with dynamic key enzyme completeness cut-off and fixed pathway completeness cut-off, requires genome completeness info
-detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -dynamic_kecc -q MAG_cpl.txt 
+detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -taxon MAG_taxonomy.txt -dynamic_kecc -cpl MAG_cpl.txt 
 
 # with fixed key enzyme completeness cut-off and dynamic pathway completeness cut-off, requires genome completeness info
-detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -dynamic_pcc -q MAG_cpl.txt 
+detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -taxon MAG_taxonomy.txt -dynamic_pcc -cpl MAG_cpl.txt 
 
 # with dynamic key enzyme completeness cut-off and pathway completeness cut-off, requires genome completeness info
-detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -dynamic_kecc -dynamic_pcc -q MAG_cpl.txt
+detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -taxon MAG_taxonomy.txt -dynamic_kecc -dynamic_pcc -cpl MAG_cpl.txt
 
 ========================================================================================================================
 '''
@@ -91,11 +91,13 @@ def detectCFP(args):
     pwy_to_key_enzyme_file           = args['k']
     dynamic_pcc                      = args['dynamic_pcc']
     dynamic_kecc                     = args['dynamic_kecc']
-    mag_cpl_file                     = args['q']
+    mag_cpl_file                     = args['cpl']
+    mag_taxon_file                   = args['taxon']
     num_threads                      = args['t']
     force_overwrite                  = args['force']
     gapseq_exe                       = args['gapseq']
     keep_quiet                       = args['quiet']
+
     str_connector                    = '_|_'
 
     # define output file name
@@ -147,6 +149,29 @@ def detectCFP(args):
     genome_file_re = '%s/*.%s' % (genome_folder, genome_ext)
     genome_file_list = [os.path.basename(file_name) for file_name in glob.glob(genome_file_re)]
     genome_file_list_no_extension = ['.'.join(i.split('.')[:-1]) for i in genome_file_list]
+
+    # read in mag taxonomy
+    genome_taxon_dict = {}
+    if mag_taxon_file is None:
+        report_and_log(('Genome taxonomy not provided, all queries will be processed as bacterial genomes.'), pwd_log_file, keep_quiet)
+    else:
+        if os.path.isfile(mag_taxon_file) is False:
+            print('%s not found, program exited!')
+        else:
+            for each_genome in open(mag_taxon_file):
+                each_genome_split = each_genome.strip().split('\t')
+                if each_genome_split != ['']:
+                    genome_id = each_genome_split[0]
+                    genome_taxon = each_genome_split[1]
+                    if genome_taxon in ['Bacteria', 'bacteria', 'BACTERIA', 'Bacterial', 'bacterial', 'BACTERIAL']:
+                        genome_taxon = 'Bacteria'
+                    elif genome_taxon in ['Archaea', 'archaea', 'ARCHAEA', 'Archaeal', 'archaeal', 'ARCHAEAL']:
+                        genome_taxon = 'Archaea'
+                    else:
+                        print('Unrecognised genome domain (choose from Bacteria or Archaea), program exited!')
+                        exit()
+                    genome_taxon_dict[genome_id] = genome_taxon
+
 
     if (dynamic_kecc is True) or (dynamic_pcc is True):
         if mag_cpl_file is None:
@@ -207,7 +232,6 @@ def detectCFP(args):
 
         report_and_log(('Commands for running prodigal exported to %s' % os.path.basename(cmd_file_prodigal)), pwd_log_file, keep_quiet)
 
-
         intersect_file_list = genome_file_list_no_extension
         faa_folder = prodigal_output_folder
 
@@ -252,7 +276,6 @@ def detectCFP(args):
     dynamic_KeyEnzymeCpl_cutoff_dict = {}
     if dynamic_kecc is True:
         for genome in intersect_file_list:
-
             if genome not in genome_cpl_dict:
                 print('Genome completeness for %s not found, program exited!' % (genome))
                 exit()
@@ -363,13 +386,23 @@ def detectCFP(args):
     argument_list_for_gapseq_worker = []
     for qualified_genome in mag_to_qualified_pwys_dict:
 
+        qualified_genome_taxon = 'Bacteria'  # Archaea
+        if qualified_genome in genome_taxon_dict:
+            if genome_taxon_dict[qualified_genome] == 'Archaea':
+                qualified_genome_taxon = 'Archaea'
+
         qualified_pwys = mag_to_qualified_pwys_dict[qualified_genome]
         pwd_genome_file = '%s/%s.%s' % (genome_folder, qualified_genome, genome_ext)
         if not pwd_genome_file.startswith('/'):
             pwd_genome_file = '../../%s' % pwd_genome_file
 
         for qualified_pwy in qualified_pwys:
-            gapseq_cmd = '%s find -p %s -b %s %s > %s-%s-stdout.tbl' % (gapseq_exe, qualified_pwy, gapseq_bitscore, pwd_genome_file, qualified_genome, qualified_pwy)
+            gapseq_cmd = ''
+            if qualified_genome_taxon == 'Bacteria':
+                gapseq_cmd = '%s find -p %s -b %s %s > %s-%s-stdout.tbl' % (gapseq_exe, qualified_pwy, gapseq_bitscore, pwd_genome_file, qualified_genome, qualified_pwy)
+            if qualified_genome_taxon == 'Archaea':
+                gapseq_cmd = '%s find -p %s -b %s -t %s %s > %s-%s-stdout.tbl' % (gapseq_exe, qualified_pwy, gapseq_bitscore, qualified_genome_taxon, pwd_genome_file, qualified_genome, qualified_pwy)
+
             cmd_file_gapseq_handle.write('%s\n' % gapseq_cmd)
             argument_list_for_gapseq_worker.append(gapseq_cmd)
     cmd_file_gapseq_handle.close()
@@ -517,7 +550,8 @@ if __name__ == '__main__':
     detectCFP_parser.add_argument('-gapseq_b',      required=False, default='200',               help='Bit score cutoff for GapSeq, default: 200')
     detectCFP_parser.add_argument('-dynamic_kecc',  required=False, action="store_true",         help='use genome specific key enzyme completeness cutoff')
     detectCFP_parser.add_argument('-dynamic_pcc',   required=False, action="store_true",         help='use genome specific pathway completeness cutoff')
-    detectCFP_parser.add_argument('-q',             required=False, default=None,                help='genome completeness, no header, no genome file extension, tab separated')
+    detectCFP_parser.add_argument('-cpl',           required=False, default=None,                help='genome completeness, no header, no genome file extension, tab separated')
+    detectCFP_parser.add_argument('-taxon',         required=False, default=None,                help='genome domain, either Bacteria or Archaea, no header, no genome file extension, tab separated')
     detectCFP_parser.add_argument('-gapseq',        required=False, default='gapseq',            help='path to GapSeq executable file, default: gapseq')
     detectCFP_parser.add_argument('-t',             required=False, type=int, default=1,         help='number of threads, default: 1')
     detectCFP_parser.add_argument('-force',         required=False, action="store_true",         help='force overwrite existing results')
@@ -539,12 +573,10 @@ twine upload dist/*
 songweizhi
 
 shan88
-
 pip3 install --upgrade detectCFP
 
 # for test
 ~/PycharmProjects/detectCFP/bin/detectCFP2 -p Sponge -g mag_files_renamed -x fna -hmm combined.HMM -k pathwaysXhmmfiles.txt -force -faa faa_files -dynamic_pcc -dynamic_kecc
-
 '''
 
 
@@ -575,17 +607,22 @@ Note:
     4) column 3: minimum pathway completeness for the pathway to be considered as existing in complete genome.
     5) column 4: minimum key enzyme completeness for the pathway to be considered as existing in complete genome.
 
-5.  MAG completeness file format (-q): no header, no mag file extension, tab separated
+5.  MAG completeness file format (-cpl): no header, no mag file extension, tab separated
     mag_1	97.57
     mag_2	74.21
     mag_3	100
-    
-6. final output 1:
+
+6.  MAG taxonomy file format (-taxon): choose from Bacteria/Archaea, no header, no mag file extension, tab separated
+    mag_1	Archaea
+    mag_2	Archaea
+    mag_3	Bacteria
+ 
+7. final output 1:
     1) each pathway in the final output has three columns: PWY_HMM, PWY_completeness and PWY_found
     2) PWY_HMM: "_n_" refers to "and " and "_v_" refers to "or ".
     3) PWY_cpl: Gapseq provided pathway completeness
     4) PWY_found: "1" for detected and "0" for not.
 
-7. final output 2: presence/absence of pathways among MAGs.
+8. final output 2: presence/absence of pathways among MAGs.
 
 '''

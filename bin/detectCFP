@@ -276,7 +276,6 @@ def detectCFP(args):
     dynamic_KeyEnzymeCpl_cutoff_dict = {}
     if dynamic_kecc is True:
         for genome in intersect_file_list:
-
             if genome not in genome_cpl_dict:
                 print('Genome completeness for %s not found, program exited!' % (genome))
                 exit()
@@ -574,6 +573,7 @@ twine upload dist/*
 songweizhi
 
 shan88
+
 pip3 install --upgrade detectCFP
 
 # for test
