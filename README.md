@@ -57,7 +57,6 @@ Input file format:
        mag_2	Archaea
        mag_3	Bacteria
 
-
 How to run:
 ---
     
@@ -82,13 +81,11 @@ How to run:
 Output files:
 ---
 
-1. output 1
-    + each pathway in the final output has three columns: PWY_HMM, PWY_completeness and PWY_found
+1. Output 1:
+    + each pathway in this file has three columns: PWY_HMM, PWY_completeness and PWY_found
     + PWY_HMM: "_n_" refers to "and " and "_v_" refers to "or "
     + PWY_cpl: Gapseq provided pathway completeness
     + PWY_found: "1" for detected and "0" for not
 
-1. output 2
-   
-   presence/absence of pathways among MAGs
+1. Output 2: presence/absence of interested pathways among MAGs
 

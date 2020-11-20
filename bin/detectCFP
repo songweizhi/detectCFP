@@ -30,7 +30,6 @@ module load R/3.6.1
 module load cplex/12.9.0-academic  
 export PATH=/srv/scratch/z5039045/Softwares/gapseq:$PATH
 
-
 # example commands
 # kecc: key enzyme completeness cut-off
 # pcc:  pathway completeness cut-off
@@ -554,8 +553,8 @@ if __name__ == '__main__':
     detectCFP_parser.add_argument('-gapseq_b',      required=False, default='200',               help='Bit score cutoff for GapSeq, default: 200')
     detectCFP_parser.add_argument('-dynamic_kecc',  required=False, action="store_true",         help='use genome specific key enzyme completeness cutoff')
     detectCFP_parser.add_argument('-dynamic_pcc',   required=False, action="store_true",         help='use genome specific pathway completeness cutoff')
-    detectCFP_parser.add_argument('-cpl',           required=False, default=None,                help='genome completeness, no header, no genome file extension, tab separated')
-    detectCFP_parser.add_argument('-taxon',         required=False, default=None,                help='genome domain, either Bacteria or Archaea, no header, no genome file extension, tab separated')
+    detectCFP_parser.add_argument('-cpl',           required=False, default=None,                help='genome completeness')
+    detectCFP_parser.add_argument('-taxon',         required=False, default=None,                help='genome domain, either Bacteria or Archaea')
     detectCFP_parser.add_argument('-gapseq',        required=False, default='gapseq',            help='path to GapSeq executable file, default: gapseq')
     detectCFP_parser.add_argument('-t',             required=False, type=int, default=1,         help='number of threads, default: 1')
     detectCFP_parser.add_argument('-force',         required=False, action="store_true",         help='force overwrite existing results')
