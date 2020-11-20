@@ -30,18 +30,19 @@ module load R/3.6.1
 module load cplex/12.9.0-academic  
 export PATH=/srv/scratch/z5039045/Softwares/gapseq:$PATH
 
+
 # example commands
-# with fixed key enzyme completeness cut-off and pathway completeness cut-off, as specified in path2hmm.txt
-detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -taxon MAG_taxonomy.txt 
+# kecc: key enzyme completeness cut-off
+# pcc:  pathway completeness cut-off
 
-# with dynamic key enzyme completeness cut-off and fixed pathway completeness cut-off, requires genome completeness info
-detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -taxon MAG_taxonomy.txt -dynamic_kecc -cpl MAG_cpl.txt 
+# with fixed kecc and fixed pcc, as specified in path2hmm.txt
+detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -taxon MAG_taxon.txt 
 
-# with fixed key enzyme completeness cut-off and dynamic pathway completeness cut-off, requires genome completeness info
-detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -taxon MAG_taxonomy.txt -dynamic_pcc -cpl MAG_cpl.txt 
+# with dynamic kecc and fixed pcc, requires genome completeness info
+detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -taxon MAG_taxon.txt -dynamic_kecc -cpl MAG_cpl.txt 
 
-# with dynamic key enzyme completeness cut-off and pathway completeness cut-off, requires genome completeness info
-detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -taxon MAG_taxonomy.txt -dynamic_kecc -dynamic_pcc -cpl MAG_cpl.txt
+# with dynamic kecc and dynamic pcc, requires genome completeness info
+detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -taxon MAG_taxon.txt -dynamic_kecc -dynamic_pcc -cpl MAG_cpl.txt
 
 ========================================================================================================================
 '''
@@ -97,14 +98,19 @@ def detectCFP(args):
     force_overwrite                  = args['force']
     gapseq_exe                       = args['gapseq']
     keep_quiet                       = args['quiet']
+    dict_key_connector               = '_|_'
 
-    str_connector                    = '_|_'
 
-    # define output file name
+    ############################################## define file/folder name #############################################
+
+    if genome_folder[-1] == '/':
+        genome_folder = genome_folder[:-1]
+
     genome_folder_basename = genome_folder
     if '/' in genome_folder:
         genome_folder_basename = genome_folder.split('/')[-1]
-    if output_prefix == None:
+
+    if output_prefix is None:
         output_prefix = genome_folder_basename
 
     detectCFP_wd                                = '%s_detectCFP_wd'                % output_prefix
@@ -124,7 +130,7 @@ def detectCFP(args):
         print('Output folder detected, program exited: %s' % detectCFP_wd)
         exit()
     else:
-        force_create_folder(detectCFP_wd)
+        os.mkdir(detectCFP_wd)
 
 
     ################################################ check dependencies ################################################
@@ -172,7 +178,6 @@ def detectCFP(args):
                         exit()
                     genome_taxon_dict[genome_id] = genome_taxon
 
-
     if (dynamic_kecc is True) or (dynamic_pcc is True):
         if mag_cpl_file is None:
             print('Genome completeness file did not provide, program exited!')
@@ -200,7 +205,6 @@ def detectCFP(args):
                 genomes_without_cpl_info.append(input_genome)
 
         if genomes_without_cpl_info != []:
-
             print('Completeness info not found for the following genomes:')
             print(','.join(genomes_without_cpl_info))
             print('Completeness info not found for above genomes, program exited!')
@@ -244,7 +248,7 @@ def detectCFP(args):
         # get file intersection
         intersect_file_list = set(genome_file_list_no_extension).intersection(faa_file_list_no_extension)
         if len(genome_file_list_no_extension) != len(intersect_file_list):
-            report_and_log(('Found %s genomes with provided faa file, will detect pathways on these genomes.' % len(intersect_file_list)), pwd_log_file, keep_quiet)
+            report_and_log(('Found %s genomes with provided faa file, will detect pathways only from these genomes.' % len(intersect_file_list)), pwd_log_file, keep_quiet)
 
 
     ########################################## read in pathway to key enzyme file ##########################################
@@ -267,7 +271,7 @@ def detectCFP(args):
             else:
                 pwy_to_key_enzyme_dict[pwy_id].append(key_enzyme_list)
 
-            key_str = '%s%s%s' % (pwy_id, str_connector, key_enzyme_str)
+            key_str = '%s%s%s' % (pwy_id, dict_key_connector, key_enzyme_str)
             default_PwyCpl_cutoff_dict[key_str] = PwyCpl
             default_KeyEnzymeCpl_cutoff_dict[key_str] = KeyEnzymeCpl
 
@@ -360,7 +364,7 @@ def detectCFP(args):
                     if key_enzyme in current_mag_detected_key_enzymes:
                         key_enzyme_group_detected.add(key_enzyme)
 
-                current_key_str = '%s%s%s' % (pathway, str_connector, ','.join(key_enzyme_group))
+                current_key_str = '%s%s%s' % (pathway, dict_key_connector, ','.join(key_enzyme_group))
                 key_str_cutoff = current_mag_KeyEnzymeCpl_cutoff[current_key_str]
                 if (len(key_enzyme_group_detected) * 100 / len(key_enzyme_group)) >= key_str_cutoff:
                     current_pathway_key_enzyme_qualified.append('yes')
@@ -375,8 +379,6 @@ def detectCFP(args):
 
 
     ###################################################### Gapseq ######################################################
-
-    report_and_log(('Running Gapseq for %s genomes with %s cores' % (len(mag_to_qualified_pwys_dict), num_threads)), pwd_log_file, keep_quiet)
 
     os.mkdir(gapseq_output_folder)
 
@@ -401,11 +403,13 @@ def detectCFP(args):
             if qualified_genome_taxon == 'Bacteria':
                 gapseq_cmd = '%s find -p %s -b %s %s > %s-%s-stdout.tbl' % (gapseq_exe, qualified_pwy, gapseq_bitscore, pwd_genome_file, qualified_genome, qualified_pwy)
             if qualified_genome_taxon == 'Archaea':
-                gapseq_cmd = '%s find -p %s -b %s -t %s %s > %s-%s-stdout.tbl' % (gapseq_exe, qualified_pwy, gapseq_bitscore, qualified_genome_taxon, pwd_genome_file, qualified_genome, qualified_pwy)
+                gapseq_cmd = '%s find -p %s -b %s -t Archaea %s > %s-%s-stdout.tbl' % (gapseq_exe, qualified_pwy, gapseq_bitscore, pwd_genome_file, qualified_genome, qualified_pwy)
 
             cmd_file_gapseq_handle.write('%s\n' % gapseq_cmd)
             argument_list_for_gapseq_worker.append(gapseq_cmd)
     cmd_file_gapseq_handle.close()
+
+    report_and_log(('Running Gapseq for %s pathways from %s genomes with %s cores' % (len(argument_list_for_gapseq_worker), len(mag_to_qualified_pwys_dict), num_threads)), pwd_log_file, keep_quiet)
 
     # run GapSeq with multiprocessing
     os.chdir(gapseq_output_folder)
@@ -487,7 +491,7 @@ def detectCFP(args):
             if current_pathway_completeness_value != 'na':
                 current_pathway_existence_list = []
                 for key_enzyme_g in current_pathway_key_enzymes:
-                    cpl_key_str = '%s%s%s' % (pwy, str_connector, ','.join(key_enzyme_g))
+                    cpl_key_str = '%s%s%s' % (pwy, dict_key_connector, ','.join(key_enzyme_g))
 
                     #  get current_pathway_completeness_cutoff
                     if dynamic_pcc is True:
@@ -539,8 +543,8 @@ if __name__ == '__main__':
 
     detectCFP_parser = argparse.ArgumentParser(description='Detect carbon fixation pathways', usage=detectCFP_usage)
 
-    # arguments for detectCFP
-    detectCFP_parser.add_argument('-p',             required=False, default=None,                help='output prefix')
+    # add arguments for detectCFP
+    detectCFP_parser.add_argument('-p',             required=False, default=None,                help='output prefix, default: same as genome folder')
     detectCFP_parser.add_argument('-g',             required=True,                               help='genome folder')
     detectCFP_parser.add_argument('-x',             required=False, default='fasta',             help='genome file extension, default: fasta')
     detectCFP_parser.add_argument('-faa',           required=False, default=None,                help='faa files, requires Prodigal if not provided')
@@ -605,8 +609,8 @@ Note:
     1) file header has to be "Pwy	KeyEnzyme	PwyCpl	KeyEnzymeCpl".
     2) column 1: pathway id, no "|" at the two ends
     3) column 2: key enzymes, if there are multiple key enzymes, separate by comma.
-    4) column 3: minimum pathway completeness for the pathway to be considered as existing in complete genome.
-    5) column 4: minimum key enzyme completeness for the pathway to be considered as existing in complete genome.
+    4) column 3: minimum pathway completeness for the pathway to be considered as existing in COMPLETE genome.
+    5) column 4: minimum key enzyme completeness for the pathway to be considered as existing in COMPLETE genome.
 
 5.  MAG completeness file format (-cpl): no header, no mag file extension, tab separated
     mag_1	97.57
