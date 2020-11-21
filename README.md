@@ -1,6 +1,5 @@
 
 ## detectCFP (Pipeline for detecting carbon fixation pathways)
-
 [![pypi licence](https://img.shields.io/pypi/l/detectCFP.svg)](https://opensource.org/licenses/gpl-3.0.html)
 [![pypi version](https://img.shields.io/pypi/v/detectCFP.svg)](https://pypi.python.org/pypi/detectCFP) 
 
@@ -8,31 +7,31 @@
 Dependencies
 ---
 
-[Prodigal](https://github.com/hyattpd/Prodigal), 
-[HMMER](http://hmmer.org) and 
+[Prodigal](https://github.com/hyattpd/Prodigal)
+
+[HMMER](http://hmmer.org) 
+
 [GapSeq](https://github.com/jotech/gapseq)
 
 
 How to install:
 ---
 
-+ To install
-
-      pip3 install detectCFP
-
-+ To upgrade
-   
-      pip3 install --upgrade detectCFP
+    # to install 
+    pip3 install detectCFP
+    
+    # to upgrade 
+    pip3 install --upgrade detectCFP
 
 Input file format:
 ---
 
 1. path2hmm file: **TAB** separated columns.
    + File header has to be "Pwy	KeyEnzyme	PwyCpl	KeyEnzymeCpl".
-   + Col 1: pathway id, no "|" at the two ends
-   + Col 2: hmm id of key enzymes, if there are multiple key enzymes, separate by comma.
-   + Col 3: minimum pathway completeness for the pathway to be considered as existing in **COMPLETE** genome.
-   + Col 4: minimum key enzyme completeness for the pathway to be considered as existing in **COMPLETE** genome.
+   + **Col 1**: pathway id, no "|" at the two ends
+   + **Col 2**: hmm id of key enzymes, if there are multiple key enzymes, separate by comma.
+   + **Col 3**: minimum pathway completeness for the pathway to be considered as existing in **COMPLETE** genome.
+   + **Col 4**: minimum key enzyme completeness for the pathway to be considered as existing in **COMPLETE** genome.
 
          Pwy	KeyEnzyme	PwyCpl	KeyEnzymeCpl
          rTCA1	citas,citbs	85	100
@@ -59,33 +58,31 @@ Input file format:
 
 How to run:
 ---
-    
-1. Example commands for running detectCFP
 
-    **kecc**: key enzyme completeness cut-off
-    
-    **pcc**: pathway completeness cut-off
++ **KECC**: key enzyme completeness cut-off
 
-   + with fixed kecc and fixed pcc, as specified in path2hmm.txt
-         
-         detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force 
++ **PCC**: pathway completeness cut-off
 
-   + with dynamic kecc and fixed pcc, requires genome completeness info
+1. With fixed KECC and fixed PCC, as specified in path2hmm.txt
+     
+       detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -taxon MAG_taxon.txt 
 
-         detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -dynamic_kecc -q MAG_cpl.txt 
+1. With dynamic KECC and fixed PCC, requires genome completeness info
 
-   + with dynamic kecc and dynamic pcc, requires genome completeness info
+       detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -taxon MAG_taxon.txt -dynamic_kecc -cpl MAG_cpl.txt 
 
-         detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -dynamic_kecc -dynamic_pcc -q MAG_cpl.txt
+1. With dynamic KECC and dynamic PCC, requires genome completeness info
+
+       detectCFP -p DeepSea -g MAG_files -x fna -hmm keyEnzymes.hmm -k path2hmm.txt -t 12 -force -taxon MAG_taxon.txt -dynamic_kecc -dynamic_pcc -cpl MAG_cpl.txt
 
 Output files:
 ---
 
 1. Output 1:
-    + each pathway in this file has three columns: PWY_HMM, PWY_completeness and PWY_found
-    + PWY_HMM: "_n_" refers to "and " and "_v_" refers to "or "
-    + PWY_cpl: Gapseq provided pathway completeness
-    + PWY_found: "1" for detected and "0" for not
+    + Each pathway in this file has three columns: PWY_HMM, PWY_completeness and PWY_found
+    + **PWY_HMM**: "_n_" refers to "and " and "_v_" refers to "or "
+    + **PWY_cpl**: Gapseq provided pathway completeness
+    + **PWY_found**: "1" for detected and "0" for not
 
 1. Output 2: presence/absence of interested pathways among MAGs
 
